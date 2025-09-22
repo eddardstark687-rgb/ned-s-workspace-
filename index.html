@@ -5,19 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLAMES Game</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
-        input { width: 100%; padding: 8px; margin: 5px 0; }
-        button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
-        #result { margin-top: 20px; font-size: 18px; text-align: center; }
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; text-align: center; }
+        input { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; font-size: 16px; }
+        button:hover { background: #45a049; }
+        #result { margin-top: 20px; font-size: 18px; padding: 15px; border-radius: 5px; }
+        .friends { background: #e7f3ff; color: #007bff; }
+        .lovers { background: #fff0f5; color: #ff69b4; }
+        .affection { background: #f0fff0; color: #32cd32; }
+        .marriage { background: #fff8dc; color: #ffd700; }
+        .enemy { background: #ffe4e1; color: #dc143c; }
+        .siblings { background: #f5f5f5; color: #808080; }
     </style>
 </head>
 <body>
-    <h1>FLAMES Calculator</h1>
-    <label for="name1">Enter your name:</label>
-    <input type="text" id="name1" placeholder="e.g., John">
+    <h1>🔥 FLAMES Calculator 🔥</h1>
+    <p>Enter names to find out your relationship fate!</p>
     
-    <label for="name2">Enter your crush's name:</label>
-    <input type="text" id="name2" placeholder="e.g., Jane">
+    <label for="name1">Your name:</label>
+    <input type="text" id="name1" placeholder="e.g., Alice">
+    
+    <label for="name2">Crush's name:</label>
+    <input type="text" id="name2" placeholder="e.g., Bob">
     
     <button onclick="calculateFlames()">Calculate FLAMES</button>
     
@@ -34,67 +43,78 @@
             }
             
             // Remove spaces
-            let cleanName1 = name1.replace(/\s/g, '');
-            let cleanName2 = name2.replace(/\s/g, '');
+            let n = name1.replace(/\s/g, '');
+            let n2 = name2.replace(/\s/g, '');
             
-            // Count frequencies
-            let count1 = {};
-            for (let char of cleanName1) {
-                count1[char] = (count1[char] || 0) + 1;
-            }
-            let count2 = {};
-            for (let char of cleanName2) {
-                count2[char] = (count2[char] || 0) + 1;
-            }
+            // Convert to arrays
+            let listN = n.split('');
+            let listN2 = n2.split('');
             
-            // Get all unique characters
-            let allChars = new Set([...Object.keys(count1), ...Object.keys(count2)]);
-            
-            // Compute remaining unique letters (surplus after removing commons)
-            let remainingSet = new Set();
-            for (let char of allChars) {
-                let c1 = count1[char] || 0;
-                let c2 = count2[char] || 0;
-                let minC = Math.min(c1, c2);
-                if (c1 > minC || c2 > minC) {
-                    remainingSet.add(char);
+            // Remove common characters (mimicking the nested loop removal)
+            for (let i of listN) {
+                for (let j of listN2) {
+                    if (i === j) {
+                        listN = listN.filter(char => char !== i);  // Remove all occurrences to match intent
+                        listN2 = listN2.filter(char => char !== j);
+                        break;  // Avoid infinite loop by breaking after match
+                    }
                 }
             }
             
-            let l = remainingSet.size;
+            // Extend n with n2 and get unique
+            let combined = [...listN, ...listN2];
+            let uniqueSet = new Set(combined);
+            let l = uniqueSet.size;
             
             // FLAMES elimination
             let flames = ['f', 'l', 'a', 'm', 'e', 's'];
             let currentL = l;
             while (flames.length > 1) {
                 let temp = flames.length;
-                let idx;
+                let index;
                 if (currentL <= temp) {
-                    idx = currentL - 1;
-                    if (idx < 0) idx = temp - 1;
+                    index = currentL - 1;
                 } else {
                     currentL = currentL % temp;
-                    idx = currentL - 1;
-                    if (idx < 0) idx = temp - 1;
+                    index = currentL - 1;
                 }
-                flames.splice(idx, 1);
+                flames.splice(index, 1);
             }
             
-            // Determine meaning
+            // Determine result
             let result = flames[0];
-            let meaning;
+            let meaning, className;
             switch (result) {
-                case 'f': meaning = 'Friends'; break;
-                case 'l': meaning = 'Lovers'; break;
-                case 'a': meaning = 'Affection'; break;
-                case 'm': meaning = 'Marriage'; break;
-                case 'e': meaning = 'Enemy'; break;
-                default: meaning = 'Siblings';
+                case 'f': 
+                    meaning = 'Friends'; 
+                    className = 'friends';
+                    break;
+                case 'l': 
+                    meaning = 'Lovers'; 
+                    className = 'lovers';
+                    break;
+                case 'a': 
+                    meaning = 'Affection'; 
+                    className = 'affection';
+                    break;
+                case 'm': 
+                    meaning = 'Marriage'; 
+                    className = 'marriage';
+                    break;
+                case 'e': 
+                    meaning = 'Enemy'; 
+                    className = 'enemy';
+                    break;
+                default: 
+                    meaning = 'Siblings'; 
+                    className = 'siblings';
             }
             
             document.getElementById('result').innerHTML = `
-                <h2 style="color: #4CAF50;">You two are ${meaning}!</h2>
-                <p>Unique letters count: ${l}</p>
+                <div class="${className}">
+                    <h2>${meaning}!</h2>
+                    <p>Unique letters: ${l}</p>
+                </div>
             `;
         }
     </script>
